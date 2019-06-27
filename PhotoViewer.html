@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+		<head>
+				<meta charset="utf-8" />
+				<!-- Mobile-first Style -->
+				<meta name="viewport" content="width=device-width, initial-scale=1" />
+				<!-- Webpage Description -->
+				<meta name="description" content="This is my second project webpage for CMSC389J for Winter 2018" />
+				<title>Photo Viewer</title>
+
+				<style>
+						body{ background-color:#FFF1CC }
+						h1.title{ text-decoration: underline }
+
+				</style>
+		</head>
+
+		<body onload = "main()">
+			<h1 class="title">Viewer</h1>
+			<img id="landing" src="InitialImage.jpg" width="444" height="293" alt=""/>
+			<br>
+			<hr>
+
+		<form id="projForm">
+			Photos' Folder:
+			<input type="text" id="foldername" value="umcp/" /><br /><br />
+			Common Name:
+			<input type="text" id="imgname" value="college"/><br /><br />
+			Start Photo Number:
+			<input type="text" id="startNo" value="1"/>
+			&nbsp;
+			End Photo Number:
+			<input type="text" id="endNo" value="1"/><br /><br />
+		</form>
+
+			<input type="button" id="SlideShow" value="Slide Show" />
+			<input type="button" id="RandomSlideShow" value="Random Slide Show" />
+			<input type="button" id="PreviousSlide" value="Previous Slide" />
+			<input type="button" id="NextSlide" value="Next Slide" />
+			<input type="button" id="AutoSlideShow" value="Auto Slide Show" />
+			<input type="button" id="AutoRandomSlideShow" value="Auto Random Slide Show" />
+			<input type="button" id="StopAutoShow" value="Stop Auto Show" /><br /><br />
+			<input type="button" id="reset" value="Reset" />
+
+			<script>
+					"use strict"
+
+					var dataArray = [];
+					var interval;
+
+					function main() {
+							document.getElementById("SlideShow").addEventListener("click", SS);
+							document.getElementById("RandomSlideShow").addEventListener("click", RSS);
+							document.getElementById("PreviousSlide").addEventListener("click", PS);
+							document.getElementById("NextSlide").addEventListener("click", NS);
+							document.getElementById("AutoSlideShow").addEventListener("click", autoSS);
+							document.getElementById("AutoRandomSlideShow").addEventListener("click", autoRSS);
+							document.getElementById("StopAutoShow").addEventListener("click", stopAS);
+							document.getElementById("reset").addEventListener("click", Restart);
+					}
+
+					function getArrayPhotosNames() {
+						var first = document.getElementById("startNo").value;
+						var last = document.getElementById("endNo").value;
+
+						if (last < first) {
+								alert("Invalid Numbers");
+								Restart();
+								return;
+						}
+						
+						dataArray = [];
+
+						var folder = document.getElementById("foldername").value;
+						var name = document.getElementById("imgname").value;
+						var path = folder + name;
+
+						var j = 0;
+
+						for (var i = first; i <= last; i++) {
+							var ins1 = path + i;
+							var insert = ins1 + ".jpg";
+							dataArray[j] = insert;
+							j++;
+						}
+
+						return dataArray;
+					}
+
+					function randomize(dataArray) {
+						//used Durstenfeld shuffle method: http://www.blackwasp.co.uk/FisherYatesShuffle.aspx
+						for (var i = dataArray.length - 1; i > 0; i--) {
+		        		let j = Math.floor(Math.random() * (i + 1));
+				        let tmp = dataArray[i];
+				        dataArray[i] = dataArray[j];
+				        dataArray[j] = tmp;
+    				}
+    				return dataArray;
+					}
+
+					function SS() {
+							var arr = getArrayPhotosNames();
+							var imgElt = document.getElementById("landing");
+							imgElt.setAttribute("src", arr[0]);
+
+					}
+
+					function Restart() {
+						document.getElementById("projForm").reset();
+					}
+
+					function RSS() {
+							var arr = getArrayPhotosNames();
+							arr = randomize(arr);
+							var imgElt = document.getElementById("landing");
+							imgElt.setAttribute("src", arr[0]);
+					}
+
+					function NS() {
+							var imgElt = document.getElementById("landing");
+							var landingpix = imgElt.getAttribute("src");
+							
+							var k = 0;
+
+							for (var i = 0; i < dataArray.length; i++) {
+									if (landingpix === dataArray[i]) {
+										k = i;
+										break;
+									}
+							}
+
+							if (k === (dataArray.length - 1)) {
+								imgElt.setAttribute("src", dataArray[0]);
+							} 
+							else {
+								imgElt.setAttribute("src", dataArray[k+1]);
+							}
+					}
+
+					function PS() {
+							var imgElt = document.getElementById("landing");
+							var landingpix = imgElt.getAttribute("src");
+							
+							var k = 0;
+
+							for (var i = 0; i < dataArray.length; i++) {
+									if (landingpix === dataArray[i]) {
+										k = i;
+										break;
+									}
+							}
+
+							if (k === 0) {
+									imgElt.setAttribute("src", dataArray[dataArray.length-1]);
+							}
+							else {
+									imgElt.setAttribute("src", dataArray[k-1]);
+							}
+					}
+
+					function autoSS() {
+							var intervalInMilliseconds = 1000;
+							getArrayPhotosNames();
+		
+              interval = setInterval("NS()", intervalInMilliseconds); 
+
+					}
+
+					function autoRSS() {
+							var intervalInMilliseconds = 1000;
+
+							var arr = getArrayPhotosNames();
+							arr = randomize(arr);
+							interval = setInterval("NS()", intervalInMilliseconds); 
+					}
+
+					function stopAS() {
+							clearInterval(interval);
+					}
+
+			</script>
+
+
+		</body>
